@@ -1,20 +1,17 @@
-from djongo import models
+from djongo.models import (
+    Model,
+    AutoField,
+    CharField,
+    DateTimeField,
+    DecimalField,
+)
 
-class Business(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100,null=False, blank=False)
-    address = models.CharField(max_length=100,null=False, blank=False)
 
-class BusinessDomain(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100,null=False, blank=False, unique=True)
-
-class BusinessDomainService(models.Model):
-    id = models.AutoField(primary_key=True)
-    domain = models.ForeignKey(BusinessDomain, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100,null=False, blank=False,unique=True)
-    
-class BusinessDomainAssociation(models.Model):
-    id = models.AutoField(primary_key=True)
-    business = models.ForeignKey(Business, on_delete=models.CASCADE)
-    domain = models.ForeignKey(BusinessDomain, on_delete=models.CASCADE)
+class Business(Model):
+    business_id = AutoField(primary_key=True)
+    name = CharField(max_length=100,null=False, blank=False)
+    address = CharField(max_length=100, null=False, blank=False)
+    latitude = DecimalField(max_digits=15, null=False, blank=False)
+    longitude = DecimalField(max_digits=15, null=False, blank=False)
+    rating = DecimalField(max_digits=3, null=True, blank=True)
+    created_at = DateTimeField(auto_now_add=True)
