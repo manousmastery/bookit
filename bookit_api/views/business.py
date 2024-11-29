@@ -7,8 +7,18 @@ from ..models import Business
 from ..serializers import BusinessSerializer
 
 
-class BusinessListView(APIView):
+class BusinessView(APIView):
     def get(self, request):
         businesses = Business.objects.all()
         serializer = BusinessSerializer(businesses, many=True)  # Serialize queryset
         return Response(serializer.data)  # Return serialized data
+    
+    @swagger_auto_schema(
+        request_body=BusinessSerializer  # Specifies the expected request body schema
+    )
+    def post(self, request):
+        serializer = BusinessSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
