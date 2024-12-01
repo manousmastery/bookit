@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from bookit_api.models.usermodel import User
+from bookit_api.models.user import User
 
 
 class UserSerializer(serializers.ModelSerializer):
