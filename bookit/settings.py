@@ -27,7 +27,6 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
-CRISPY_TEMPLATE_PACK="bootstrap4"
 
 # Application definition
 
@@ -40,8 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bookit_api',
     'rest_framework',
-    'drf_yasg',
-    "crispy_forms"
 ]
 
 MIDDLEWARE = [
