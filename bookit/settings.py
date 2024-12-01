@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-&6f)h7v-c*4!&q40=6*kccd(=*as%heu#um3gryu7wu4%0-3@p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True   # set to True for swagger to work
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bookit_api',
     'rest_framework',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -127,8 +128,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-CORS_ORIGIN_ALLOW_ALL = True
 
 
 AUTH_USER_MODEL = 'bookit_api.User'
