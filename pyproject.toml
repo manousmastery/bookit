@@ -20,3 +20,26 @@ license = {text = "MIT"}
 
 [tool.pdm]
 distribution = false
+
+[dependency-groups]
+dev = [
+    "black>=24.10.0",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310"]
+skip-string-normalization = true  # Retain single quotes and avoid normalizing to double quotes
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | /bookit_api/migrations
+)/
+'''

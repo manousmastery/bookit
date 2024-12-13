@@ -1,20 +1,28 @@
 from django.core.exceptions import ValidationError
 
 from bookit_api.models.servicecategory import ServiceCategory
+from bookit_api.serializers.servicecategoryserializer import ServiceCategorySerializer
 
 
 class CategoryService:
-    def add_category(self, category_name: str) -> ServiceCategory:
+    def add_category(self, category_data: dict) -> ServiceCategory:
         """
         Adds a new category with the given name.
 
-        :param category_name: Name of the category to add.
+        :param category_data: dict of the category to add name + description.
         :return: The created ServiceCategory instance.
         :raises ValidationError: If the category already exists.
         """
-        if ServiceCategory.objects.filter(name=category_name).exists():
-            raise ValidationError(f"Category '{category_name}' already exists.")
-        return ServiceCategory.objects.create(name=category_name)
+        serializer = ServiceCategorySerializer(data=category_data)
+        serializer.is_valid(raise_exception=True)
+
+        name, description = category_data.get('name'), category_data.get('description')
+
+        if ServiceCategory.objects.filter(name=name.lower()).exists():
+            raise ValidationError(f"Category '{name}' already exists.")
+
+        category = ServiceCategory.objects.create(name=name.lower(), description=description)
+        return ServiceCategorySerializer(category).data
 
     def remove_category(self, category_name: str) -> dict:
         """
@@ -25,7 +33,7 @@ class CategoryService:
         :raises ValidationError: If the category does not exist.
         """
         try:
-            category = ServiceCategory.objects.get(name=category_name)
+            category = ServiceCategory.objects.get(name=category_name.lower())
             category.delete()
             return {"success": f"Category '{category_name}' has been removed."}
         except ServiceCategory.DoesNotExist:
@@ -37,7 +45,8 @@ class CategoryService:
 
         :return: A list of all ServiceCategory instances.
         """
-        return ServiceCategory.objects.all()
+        categories = ServiceCategory.objects.all()
+        return ServiceCategorySerializer(categories, many=True).data
 
     def is_category_exist(self, category_name: str) -> bool:
         """

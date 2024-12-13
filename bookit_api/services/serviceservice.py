@@ -10,11 +10,12 @@ class ServiceService:
     def __init__(self):
         self.service_category_service = CategoryService()
 
-    def add_service(self, name: str, description: str, category_name: str):
+    def add_service(self, service_name: str, category_name: str, description: str | None = None):
+    # def add_service(self, service_name: str, description: str | None = None):
         """
         Add a new service under a specific category.
 
-        :param name: Name of the service.
+        :param service_name: name of the service.
         :param description: Description of the service.
         :param category_name: Name of the category to associate with the service.
         :return: Serialized service data.
@@ -26,7 +27,7 @@ class ServiceService:
         category = ServiceCategory.objects.get(name=category_name)
         service = Service.objects.create(
             category=category,
-            name=name,
+            name=service_name,
             description=description,
         )
         return ServiceSerializer(service).data
@@ -67,7 +68,7 @@ class ServiceService:
             if description:
                 service.description = description
             if category_name:
-                if not self.service_category_service.is_category_exist(category_name):
+                if not self.service_service.is_category_exist(category_name):
                     raise ValidationError(f"Category '{category_name}' does not exist.")
                 service.category = ServiceCategory.objects.get(name=category_name)
 
@@ -77,3 +78,22 @@ class ServiceService:
             raise ValidationError(f"Service with ID {service_id} does not exist.")
         except Exception as e:
             raise ValidationError(f"Failed to update service: {str(e)}")
+
+
+    def get_all_services(self) -> list:
+        """
+        Retrieves all services.
+
+        :return: A list of all ServiceCategory instances.
+        """
+        services = Service.objects.all()
+        return ServiceSerializer(services, many=True).data
+
+    def is_service_exist(self, service_name: str) -> bool:
+        """
+        Checks if a category with the given name exists.
+
+        :param service_name: Name of the category to check.
+        :return: True if the category exists, otherwise False.
+        """
+        return Service.objects.filter(name=service_name).exists()
