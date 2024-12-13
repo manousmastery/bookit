@@ -7,5 +7,5 @@ class BusinessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Business
-        fields = ['business_id', 'name', 'owner', 'description']
+        fields = ['business_id', 'name', 'owner', 'description', 'latitude', 'longitude', 'address']
         read_only_fields = ['business_id']

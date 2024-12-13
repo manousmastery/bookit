@@ -19,7 +19,7 @@ class BusinessService:
         businesses = Business.objects.all()
         return BusinessSerializer(businesses, many=True).data
 
-    def add(self, request, user):
+    def add_business_with_owner(self, request, user):
         """
         Add a new business and assign the creator as the owner.
         """
@@ -31,9 +31,11 @@ class BusinessService:
                 business = Business.objects.create(
                     name=serializer.validated_data['name'],
                     description=serializer.validated_data.get('description'),
-                    owner=user,
+                    latitude=serializer.validated_data.get('latitude', None),
+                    longitude=serializer.validated_data.get('longitude', None),
+                    address=serializer.validated_data.get('address', None),
                 )
-                BusinessUser.objects.create(
+                self.business_user_service.add_owner_to_business(
                     user=user,
                     business=business,
                     role='Owner'
@@ -42,51 +44,6 @@ class BusinessService:
         except Exception as e:
             raise ValidationError(f"Failed to create business: {str(e)}")
 
-    def add_employee(self, request, user, business):
-        """
-        Add a user to a business with a specified role.
-        """
-        role = request.data.get('role')
-        if not role:
-            raise ValidationError('A role (Admin, Staff) must be provided')
-
-        if role not in ['Admin', 'Staff']:
-            raise ValidationError('Invalid role provided')
-
-        try:
-            with transaction.atomic():
-                _ = BusinessUser.objects.create(
-                    user=user,
-                    business=business,
-                    role=role
-                )
-            return {"success": f"User {user.email} added as {role} to business {business.name}."}
-        except Exception as e:
-            raise ValidationError(f"Failed to join business: {str(e)}")
-
-    def remove_employee(self, business_id: int, user_id: int):
-        """
-        Remove an employee from a business.
-        """
-        try:
-            business_user = BusinessUser.objects.get(business_id=business_id, user_id=user_id)
-            business_user.delete()
-            return {"success": f"User with ID {user_id} removed from business with ID {business_id}."}
-        except BusinessUser.DoesNotExist:
-            raise ValidationError(f"Employee with User ID {user_id} not found in Business ID {business_id}.")
-        except Exception as e:
-            raise ValidationError(f"Failed to remove employee: {str(e)}")
-
-    def get_employees(self, business_id: int):
-        """
-        Retrieve all employees of a business.
-        """
-        try:
-            business_users = BusinessUser.objects.filter(business_id=business_id)
-            users = User.objects.filter(id__in=business_users.values_list('user_id', flat=True))
-            return UserSerializer(users, many=True).data
-        except Exception as e:
-            raise ValidationError(f"Failed to retrieve employees: {str(e)}")
 
     def get_business_info(self, business_id: int):
         """
@@ -94,7 +51,7 @@ class BusinessService:
         """
         try:
             business = Business.objects.get(business_id=business_id)
-            employees = self.get_employees(business_id)
+            employees = self.business_user_service.get_employees(business_id)
             business_data = BusinessSerializer(business).data
             business_data['employees'] = employees
             return business_data

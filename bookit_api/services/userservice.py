@@ -76,7 +76,7 @@ class UserService:
         """
         if not request.user.is_authenticated:
             raise ValidationError("User must be authenticated to create a business")
-        return self.business_service.add(request, request.user)
+        return self.business_service.add_business_with_owner(request, request.user)
 
     def update_profile(self, user_id, data):
         """
