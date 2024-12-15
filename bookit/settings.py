@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-&6f)h7v-c*4!&q40=6*kccd(=*as%heu#um3gryu7wu4%0-3@p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True   # set to True for swagger to work
+DEBUG = False   # set to True for swagger to work and debug not to work
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
@@ -131,3 +131,31 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 AUTH_USER_MODEL = 'bookit_api.User'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'NOTSET',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'NOTSET',
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'propagate': False,
+            'level': 'ERROR'
+        }
+    }
+}
