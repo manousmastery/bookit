@@ -2,7 +2,7 @@ from rest_framework import serializers
 from bookit_api.models.review import Review
 
 
-class ServiceSerializer(serializers.ModelSerializer):
+class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ['review_id', 'client', 'commentaire', 'grade', 'client', 'business']

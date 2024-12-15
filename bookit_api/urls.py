@@ -4,7 +4,8 @@ from .views.categoryview import add_category, remove_category, get_categories
 from .views.serviceview import get_services, add_service, remove_service, get_business_for_service
 from .views.userview import login_view, logout_view, signup_view, get_all, get_by_id, create_business_view
 from .views.businessview import get_all_business, get_business_info, add_service_for_business, \
-    delete_service_for_business, update_service_for_business, get_services_for_business, add_employee, remove_employee
+    delete_service_for_business, update_service_for_business, get_services_for_business, add_employee, remove_employee, \
+    get_business_from_category
 
 urlpatterns = [
     path('user/login/', login_view),
@@ -24,6 +25,7 @@ urlpatterns = [
     path('business/services/<int:business_id>/', get_services_for_business),
     path('business/add_employee/<int:business_id>/', add_employee),
     path('business/remove_employee/<int:business_id>/', remove_employee),
+    path('business/get_by_category/', get_business_from_category),
 
     ######################################################################################################
     path('category/get_all/', get_categories),

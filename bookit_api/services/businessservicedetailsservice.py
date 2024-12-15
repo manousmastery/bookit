@@ -1,6 +1,8 @@
 from bookit_api.helpers import BusinessServiceDetailsParams
-from bookit_api.models import BusinessServiceDetails
+from bookit_api.models import BusinessServiceDetails, Service, Business
+from bookit_api.serializers.businessserializer import BusinessSerializer
 from bookit_api.serializers.businessservicedetails import BusinessServiceDetailsSerializer
+from bookit_api.serializers.serviceserializer import ServiceSerializer
 
 
 class BusinessServiceDetailsService:
@@ -65,13 +67,20 @@ class BusinessServiceDetailsService:
     def get_services_for_business(self, business):
         try:
             service_details = BusinessServiceDetails.objects.filter(business=business)
-            return BusinessServiceDetailsSerializer(service_details, many=True).data
+            services = Service.objects.filter(
+                service_id__in=service_details.values_list('service_id', flat=True)).distinct()
+            return ServiceSerializer(services, many=True).data
         except Exception as e:
             raise e
 
     def get_business_for_service(self, service):
         try:
-            business_services = BusinessServiceDetails.objects.filter(service=service)
-            return BusinessServiceDetailsSerializer(business_services, many=True).data
+            service_details = BusinessServiceDetails.objects.filter(service=service)
+            businesses = Business.objects.filter(
+                business_id__in=service_details.values_list('business_id', flat=True)).distinct()
+            return BusinessSerializer(businesses, many=True).data
         except Exception as e:
             raise e
+
+    def get_business_details_from_service(self, services):
+        return BusinessServiceDetails.objects.filter(service__in=services)

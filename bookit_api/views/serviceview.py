@@ -99,9 +99,8 @@ def remove_service(request) -> Response:
 @swagger_auto_schema(
     method="get",
     operation_description="Get business for service",
-    responses={200: BusinessServiceDetailsSerializer(many=True)},
+    responses={200: openapi.Response("List of businesses", BusinessServiceDetailsSerializer(many=True))},
 )
 @api_view(["GET"])
 def get_business_for_service(request, service_id: int) -> Response:
     return Response(data=service_service.get_business_for_service(service_id))
-

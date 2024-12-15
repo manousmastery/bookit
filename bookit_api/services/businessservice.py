@@ -67,7 +67,8 @@ class BusinessService:
     def get_services_for_business(self, business_id: int):
         try:
             business = Business.objects.get(business_id=business_id)
-            return self.business_service_detail_service.get_services_for_business(business)
+            services = self.business_service_detail_service.get_services_for_business(business)
+            return services
         except Exception as e:
             raise e
 
@@ -78,10 +79,14 @@ class BusinessService:
             return self.business_user_service.add_employee(user=user, business=business, role=role)
         except Exception as e:
             raise e
-        # (f"Failed to join business: {str(e)}")
 
     def remove_employee(self, user_id, business_id):
         try:
             return self.business_user_service.remove_employee(business_id, user_id)
         except Exception as e:
             raise e
+
+    def get_business_by_category(self, category: str):
+        business_details = self.service_service.get_business_details_from_service(category)
+        businesses = Business.objects.filter(business_id__in=business_details.values_list('business_id', flat=True)).distinct()
+        return BusinessSerializer(businesses, many=True).data

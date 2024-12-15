@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from ..helpers import BusinessServiceDetailsParams
 from ..serializers.businessserializer import BusinessSerializer
 from ..serializers.businessservicedetails import BusinessServiceDetailsSerializer
+from ..serializers.serviceserializer import ServiceSerializer
 from ..services.businessservice import BusinessService
 
 business_service =  BusinessService()
@@ -169,12 +170,11 @@ def delete_service_for_business(request, business_id):
 @swagger_auto_schema(
     method="get",
     operation_description="Get business for service",
-    responses={200: BusinessServiceDetailsSerializer(many=True)},
+    responses={200: openapi.Response("List of services", ServiceSerializer(many=True))},
 )
 @api_view(["GET"])
 def get_services_for_business(request, business_id: int) -> Response:
     return Response(data=business_service.get_services_for_business(business_id))
-
 
 @swagger_auto_schema(
     method="post",
@@ -224,3 +224,16 @@ def add_employee(request, business_id) -> Response:
 def remove_employee(request, business_id) -> Response:
     user_id= request.data['user_id']
     return Response(data=business_service.remove_employee(user_id, business_id))
+
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get business by category",
+    responses={200: BusinessSerializer(many=True)},
+)
+@api_view(["GET"])
+def get_business_from_category(request) -> Response:
+    category_name = request.query_params.get('category', None)
+    if not category_name:
+        Response(data='category must be provided', status=status.HTTP_400_BAD_REQUEST)
+    result = business_service.get_business_by_category(category_name)
+    return Response(data=result, status=status.HTTP_200_OK)

@@ -12,17 +12,7 @@ class ServiceService:
         self.service_category_service = CategoryService()
         self.business_service_detail_service = BusinessServiceDetailsService()
 
-
     def add_service(self, service_name: str, category_name: str, description: str | None = None):
-        """
-        Add a new service under a specific category.
-
-        :param service_name: name of the service.
-        :param description: Description of the service.
-        :param category_name: Name of the category to associate with the service.
-        :return: Serialized service data.
-        :raises ValidationError: If the category does not exist.
-        """
         if not self.service_category_service.is_category_exist(category_name):
             raise ValidationError(f"Category '{category_name}' does not exist.")
 
@@ -35,13 +25,6 @@ class ServiceService:
         return ServiceSerializer(service).data
 
     def remove_service(self, name: str):
-        """
-        Remove a service by its name.
-
-        :param name: Name of the service to remove.
-        :return: A success message on successful removal.
-        :raises ValidationError: If the service does not exist.
-        """
         try:
             service = Service.objects.get(name=name)
             service.delete()
@@ -52,16 +35,6 @@ class ServiceService:
             raise ValidationError(f"Failed to remove service: {str(e)}")
 
     def update_service(self, service_id: int, name: str = None, description: str = None, category_name: str = None):
-        """
-        Update an existing service's details.
-
-        :param service_id: ID of the service to update.
-        :param name: New name for the service (optional).
-        :param description: New description for the service (optional).
-        :param category_name: New category name for the service (optional).
-        :return: Serialized service data.
-        :raises ValidationError: If the service or category does not exist.
-        """
         try:
             service = Service.objects.get(id=service_id)
 
@@ -83,21 +56,10 @@ class ServiceService:
 
 
     def get_all_services(self) -> list:
-        """
-        Retrieves all services.
-
-        :return: A list of all ServiceCategory instances.
-        """
         services = Service.objects.all()
         return ServiceSerializer(services, many=True).data
 
     def is_service_exist(self, service_name: str) -> bool:
-        """
-        Checks if a category with the given name exists.
-
-        :param service_name: Name of the category to check.
-        :return: True if the category exists, otherwise False.
-        """
         return Service.objects.filter(name=service_name).exists()
 
     def get_service(self, service_id: int) -> Service:
@@ -109,3 +71,13 @@ class ServiceService:
             return self.business_service_detail_service.get_business_for_service(service)
         except Exception as e:
             raise e
+
+    def get_services_from_category(self, category_name: str) -> list:
+        category = self.service_category_service.get_category_from_name(category_name)
+        services = Service.objects.filter(category=category).all()
+        return services
+
+    def get_business_details_from_service(self, category_name: str):
+        services = self.get_services_from_category(category_name)
+        business_details = self.business_service_detail_service.get_business_details_from_service(services)
+        return business_details
