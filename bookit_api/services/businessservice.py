@@ -1,28 +1,25 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Q
 
-from bookit_api.models import Business, BusinessUser, User
+from bookit_api.helpers import BusinessServiceDetailsParams
+from bookit_api.models import Business
 from bookit_api.serializers.businessserializer import BusinessSerializer
-from bookit_api.serializers.userserializer import UserSerializer
+from bookit_api.services.businessservicedetailsservice import BusinessServiceDetailsService
 from bookit_api.services.businessuserservice import BusinessUserService
+from bookit_api.services.serviceservice import ServiceService
 
 
 class BusinessService:
     def __init__(self):
         self.business_user_service = BusinessUserService()
+        self.service_service = ServiceService()
+        self.business_service_detail_service = BusinessServiceDetailsService()
 
     def get_all(self):
-        """
-        Retrieve all businesses with their serialized data.
-        """
         businesses = Business.objects.all()
         return BusinessSerializer(businesses, many=True).data
 
     def add_business_with_owner(self, request, user):
-        """
-        Add a new business and assign the creator as the owner.
-        """
         serializer = BusinessSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -46,9 +43,6 @@ class BusinessService:
 
 
     def get_business_info(self, business_id: int):
-        """
-        Retrieve detailed information of a business, including its employees.
-        """
         try:
             business = Business.objects.get(business_id=business_id)
             employees = self.business_user_service.get_employees(business_id)
@@ -60,12 +54,52 @@ class BusinessService:
         except Exception as e:
             raise ValidationError(f"Failed to retrieve business info: {str(e)}")
 
-    def get_business_by_filter(self, filter: str):
-        """
-        Retrieve businesses matching a name filter.
-        """
+    def add_service_for_business(self, business_detail_service_params: BusinessServiceDetailsParams):
         try:
-            businesses = Business.objects.filter(Q(name__icontains=filter) | Q(description__icontains=filter))
-            return BusinessSerializer(businesses, many=True).data
+            business_detail_service_params.business = Business.objects.get(business_id=business_detail_service_params.business_id)
+            business_detail_service_params.service = self.service_service.get_service(business_detail_service_params.service_id)
+
+            business_service_details = self.business_service_detail_service.add_business_service_details(
+                business_detail_service_params
+            )
+            return business_service_details
         except Exception as e:
-            raise ValidationError(f"Failed to filter businesses: {str(e)}")
+            raise ValidationError(f"Failed to create business service detail: {str(e)}")
+
+    def update_service_for_business(self, business_detail_service_params: BusinessServiceDetailsParams):
+        try:
+            business_detail_service_params.business = Business.objects.get(business_id=business_detail_service_params.business_id)
+            business_detail_service_params.service = self.service_service.get_service(business_detail_service_params.service_id)
+
+            business_service_details = self.business_service_detail_service.update_business_service(
+                business_detail_service_params
+            )
+            return business_service_details
+        except Exception as e:
+            raise ValidationError(f"Failed to update business service details: {str(e)}")
+
+    def delete_service_for_business(self, business_detail_service_params: BusinessServiceDetailsParams):
+        try:
+            business_detail_service_params.business = Business.objects.get(business_id=business_detail_service_params.business_id)
+            business_detail_service_params.service = self.service_service.get_service(business_detail_service_params.service_id)
+            return self.business_service_detail_service.delete_business_service(business_detail_service_params)
+        except Exception as e:
+            raise ValidationError(f"Failed to delete business service detail: {str(e)}")
+
+    # def get_business_by_filter(self, filter: str):
+    #     try:
+    #         businesses = Business.objects.filter(Q(name__icontains=filter) | Q(description__icontains=filter))
+    #         return BusinessSerializer(businesses, many=True).data
+    #     except Exception as e:
+    #         raise ValidationError(f"Failed to filter businesses: {str(e)}")
+
+    #
+    # def is_business_exist(self, business_id: int) -> bool:
+    #     """
+    #     Checks if a category with the given name exists.
+    #
+    #     :param service_name: Name of the category to check.
+    #     :return: True if the category exists, otherwise False.
+    #     """
+    #     return Business.objects.filter(business_id=business_id).exists()
+

@@ -55,7 +55,8 @@ class BusinessUserService:
         """
         try:
             business_users = BusinessUser.objects.filter(business_id=business_id)
-            users = User.objects.filter(id__in=business_users.values_list('user_id', flat=True))
-            return UserSerializer(users, many=True).data
+            users = User.objects.filter(user_id__in=business_users.values_list('user_id', flat=True))
+            users_data = UserSerializer(users, many=True).data
+            return [dict(user) for user in users_data]
         except Exception as e:
             raise ValidationError(f"Failed to retrieve employees: {str(e)}")

@@ -11,7 +11,6 @@ class ServiceService:
         self.service_category_service = CategoryService()
 
     def add_service(self, service_name: str, category_name: str, description: str | None = None):
-    # def add_service(self, service_name: str, description: str | None = None):
         """
         Add a new service under a specific category.
 
@@ -97,3 +96,6 @@ class ServiceService:
         :return: True if the category exists, otherwise False.
         """
         return Service.objects.filter(name=service_name).exists()
+
+    def get_service(self, service_id: int) -> Service:
+        return Service.objects.get(service_id=service_id)

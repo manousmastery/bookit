@@ -9,3 +9,6 @@ class BusinessServiceDetails(models.Model):
     showed_description = models.TextField(blank=True, null=True, max_length=255)
     business = models.ForeignKey('Business', on_delete=models.CASCADE)
     service = models.ForeignKey('Service', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('business', 'service')  # Ensures unique combination of business and service
