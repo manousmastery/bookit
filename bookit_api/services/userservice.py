@@ -5,12 +5,12 @@ from rest_framework.exceptions import ValidationError
 from bookit_api.models import User
 from bookit_api.serializers.userserializer import UserSerializer
 from bookit_api.services.bookingservice import BookingService
-from bookit_api.services.businessservice import BusinessService
+from bookit_api.services.businessuserservice import BusinessUserService
 
 
 class UserService:
     def __init__(self):
-        self.business_service = BusinessService()
+        self.busines_user_service = BusinessUserService()
         self.booking_service = BookingService()
 
     def login_user(self, request, email, password):
@@ -76,7 +76,7 @@ class UserService:
         """
         if not request.user.is_authenticated:
             raise ValidationError("User must be authenticated to create a business")
-        return self.business_service.add_business_with_owner(request, request.user)
+        return self.busines_user_service.add_business_with_owner(request, request.user)
 
     def update_profile(self, user_id, data):
         """
@@ -92,6 +92,10 @@ class UserService:
             raise ValidationError(f"User with ID {user_id} not found")
         except Exception as e:
             raise ValidationError(f"Failed to update profile: {str(e)}")
+
+    def get_user(self, user_id: int):
+        user = User.objects.get(pk=user_id)
+        return user
 
     def view_bookings(self, user_id: int):
         """

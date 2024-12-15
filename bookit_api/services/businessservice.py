@@ -1,5 +1,4 @@
 from django.core.exceptions import ValidationError
-from django.db import transaction
 
 from bookit_api.helpers import BusinessServiceDetailsParams
 from bookit_api.models import Business
@@ -7,6 +6,7 @@ from bookit_api.serializers.businessserializer import BusinessSerializer
 from bookit_api.services.businessservicedetailsservice import BusinessServiceDetailsService
 from bookit_api.services.businessuserservice import BusinessUserService
 from bookit_api.services.serviceservice import ServiceService
+from bookit_api.services.userservice import UserService
 
 
 class BusinessService:
@@ -14,33 +14,11 @@ class BusinessService:
         self.business_user_service = BusinessUserService()
         self.service_service = ServiceService()
         self.business_service_detail_service = BusinessServiceDetailsService()
+        self.user_service = UserService()
 
     def get_all(self):
         businesses = Business.objects.all()
         return BusinessSerializer(businesses, many=True).data
-
-    def add_business_with_owner(self, request, user):
-        serializer = BusinessSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        try:
-            with transaction.atomic():
-                business = Business.objects.create(
-                    name=serializer.validated_data['name'],
-                    description=serializer.validated_data.get('description'),
-                    latitude=serializer.validated_data.get('latitude', None),
-                    longitude=serializer.validated_data.get('longitude', None),
-                    address=serializer.validated_data.get('address', None),
-                )
-                self.business_user_service.add_owner_to_business(
-                    user=user,
-                    business=business,
-                    role='Owner'
-                )
-            return BusinessSerializer(business).data
-        except Exception as e:
-            raise ValidationError(f"Failed to create business: {str(e)}")
-
 
     def get_business_info(self, business_id: int):
         try:
@@ -86,20 +64,24 @@ class BusinessService:
         except Exception as e:
             raise ValidationError(f"Failed to delete business service detail: {str(e)}")
 
-    # def get_business_by_filter(self, filter: str):
-    #     try:
-    #         businesses = Business.objects.filter(Q(name__icontains=filter) | Q(description__icontains=filter))
-    #         return BusinessSerializer(businesses, many=True).data
-    #     except Exception as e:
-    #         raise ValidationError(f"Failed to filter businesses: {str(e)}")
+    def get_services_for_business(self, business_id: int):
+        try:
+            business = Business.objects.get(business_id=business_id)
+            return self.business_service_detail_service.get_services_for_business(business)
+        except Exception as e:
+            raise e
 
-    #
-    # def is_business_exist(self, business_id: int) -> bool:
-    #     """
-    #     Checks if a category with the given name exists.
-    #
-    #     :param service_name: Name of the category to check.
-    #     :return: True if the category exists, otherwise False.
-    #     """
-    #     return Business.objects.filter(business_id=business_id).exists()
+    def add_employee(self, user_id, business_id, role: str):
+        try:
+            user = self.user_service.get_user(user_id)
+            business = Business.objects.get(business_id=business_id)
+            return self.business_user_service.add_employee(user=user, business=business, role=role)
+        except Exception as e:
+            raise e
+        # (f"Failed to join business: {str(e)}")
 
+    def remove_employee(self, user_id, business_id):
+        try:
+            return self.business_user_service.remove_employee(business_id, user_id)
+        except Exception as e:
+            raise e

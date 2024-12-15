@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 
 from bookit_api.models import BusinessUser, Business, User
+from bookit_api.serializers.businessserializer import BusinessSerializer
 from bookit_api.serializers.userserializer import UserSerializer
 
 
@@ -16,23 +17,17 @@ class BusinessUserService:
             role=role or 'STAFF'
         )
 
-    def add_employee(self,  user, business, role: str | None = None):
-        """
-        Add a user to a business with a specified role.
-        """
+    def add_employee(self, user, business, role: str | None = None):
         if role == 'Owner':
             raise ValidationError('Invalid role provided')
 
-        try:
-            with transaction.atomic():
-                _ = BusinessUser.objects.create(
-                    user=user,
-                    business=business,
-                    role=role or 'STAFF'
-                )
-            return {"success": f"User {user.email} added as {role} to business {business.name}."}
-        except Exception as e:
-            raise ValidationError(f"Failed to join business: {str(e)}")
+        with transaction.atomic():
+            _ = BusinessUser.objects.create(
+                user=user,
+                business=business,
+                role=role or 'STAFF'
+            )
+        return {"success": f"User {user.email} added as {role} to business {business.name}."}
 
 
     def remove_employee(self, business_id: int, user_id: int):
@@ -60,3 +55,25 @@ class BusinessUserService:
             return [dict(user) for user in users_data]
         except Exception as e:
             raise ValidationError(f"Failed to retrieve employees: {str(e)}")
+
+    def add_business_with_owner(self, request, user):
+        serializer = BusinessSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            with transaction.atomic():
+                business = Business.objects.create(
+                    name=serializer.validated_data['name'],
+                    description=serializer.validated_data.get('description'),
+                    latitude=serializer.validated_data.get('latitude', None),
+                    longitude=serializer.validated_data.get('longitude', None),
+                    address=serializer.validated_data.get('address', None),
+                )
+                self.add_owner_to_business(
+                    user=user,
+                    business=business,
+                    role='Owner'
+                )
+            return BusinessSerializer(business).data
+        except Exception as e:
+            raise ValidationError(f"Failed to create business: {str(e)}")

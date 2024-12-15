@@ -3,12 +3,15 @@ from rest_framework.exceptions import ValidationError
 from bookit_api.models import Service
 from bookit_api.models.servicecategory import ServiceCategory
 from bookit_api.serializers.serviceserializer import ServiceSerializer
+from bookit_api.services.businessservicedetailsservice import BusinessServiceDetailsService
 from bookit_api.services.categoryservice import CategoryService
 
 
 class ServiceService:
     def __init__(self):
         self.service_category_service = CategoryService()
+        self.business_service_detail_service = BusinessServiceDetailsService()
+
 
     def add_service(self, service_name: str, category_name: str, description: str | None = None):
         """
@@ -99,3 +102,10 @@ class ServiceService:
 
     def get_service(self, service_id: int) -> Service:
         return Service.objects.get(service_id=service_id)
+
+    def get_business_for_service(self, service_id: int):
+        try:
+            service = Service.objects.get(service_id=service_id)
+            return self.business_service_detail_service.get_business_for_service(service)
+        except Exception as e:
+            raise e

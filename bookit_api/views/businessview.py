@@ -164,3 +164,63 @@ def delete_service_for_business(request, business_id):
         return Response(e, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@swagger_auto_schema(
+    method="get",
+    operation_description="Get business for service",
+    responses={200: BusinessServiceDetailsSerializer(many=True)},
+)
+@api_view(["GET"])
+def get_services_for_business(request, business_id: int) -> Response:
+    return Response(data=business_service.get_services_for_business(business_id))
+
+
+@swagger_auto_schema(
+    method="post",
+    operation_description="Business add employee endpoint",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "user_id": openapi.Schema(
+                type=openapi.TYPE_INTEGER, description="user_id to add"
+            ),
+            "role": openapi.Schema(
+                type=openapi.TYPE_STRING, description="Role of the employee, STAFF | ADMIN"
+            ),
+        },
+        required=["user_id", "role"],
+    ),
+    responses={
+        200: openapi.TYPE_STRING,
+        400: openapi.Response(description="Invalid data provided"),
+        500: openapi.Response(description="Internal Server Error"),
+    },
+)
+@api_view(["POST"])
+def add_employee(request, business_id) -> Response:
+    user_id, role = request.data['user_id'], request.data['role']
+    return Response(data=business_service.add_employee(user_id=user_id, business_id=business_id, role=role))
+
+@swagger_auto_schema(
+    method="delete",
+    operation_description="Business add employee endpoint",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "user_id": openapi.Schema(
+                type=openapi.TYPE_INTEGER, description="user_id to add"
+            ),
+        },
+        required=["user_id"],
+    ),
+    responses={
+        200: openapi.TYPE_STRING,
+        400: openapi.Response(description="Invalid data provided"),
+        500: openapi.Response(description="Internal Server Error"),
+    },
+)
+@api_view(["DELETE"])
+def remove_employee(request, business_id) -> Response:
+    user_id= request.data['user_id']
+    return Response(data=business_service.remove_employee(user_id, business_id))

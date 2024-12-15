@@ -61,3 +61,17 @@ class BusinessServiceDetailsService:
 
         except Exception as e:
             raise Exception(f"An error occurred while deleting the business service: {str(e)}")
+
+    def get_services_for_business(self, business):
+        try:
+            service_details = BusinessServiceDetails.objects.filter(business=business)
+            return BusinessServiceDetailsSerializer(service_details, many=True).data
+        except Exception as e:
+            raise e
+
+    def get_business_for_service(self, service):
+        try:
+            business_services = BusinessServiceDetails.objects.filter(service=service)
+            return BusinessServiceDetailsSerializer(business_services, many=True).data
+        except Exception as e:
+            raise e

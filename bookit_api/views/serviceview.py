@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
+from ..serializers.businessservicedetails import BusinessServiceDetailsSerializer
 from ..serializers.servicecategoryserializer import ServiceCategorySerializer
 from ..serializers.serviceserializer import ServiceSerializer
 from ..services.serviceservice import ServiceService
@@ -94,3 +95,13 @@ def remove_service(request) -> Response:
         return Response(
             data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+@swagger_auto_schema(
+    method="get",
+    operation_description="Get business for service",
+    responses={200: BusinessServiceDetailsSerializer(many=True)},
+)
+@api_view(["GET"])
+def get_business_for_service(request, service_id: int) -> Response:
+    return Response(data=service_service.get_business_for_service(service_id))
+
