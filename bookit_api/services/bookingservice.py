@@ -1,8 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
+
 from bookit_api.models import Booking, User, Business, BusinessServiceDetails
 from bookit_api.serializers.bookingserializer import BookingSerializer
-from bookit_api.services.businessservice import BusinessService
 
 
 class BookingService:
@@ -80,7 +80,30 @@ class BookingService:
         Retrieve all bookings for a specific business.
         """
         try:
-            bookings = Booking.objects.filter(business_id=business_id)
+            bookings = Booking.objects.filter(business_service_details__business_id=business_id)
+            return BookingSerializer(bookings, many=True).data
+        except Exception as e:
+            raise ValidationError(f"Failed to retrieve bookings: {str(e)}")
+
+
+    def get_bookings_by_client(self, user_id):
+        """
+        Retrieve all bookings for a specific client.
+        """
+        try:
+            client = User.objects.get(user_id=user_id)
+            bookings = Booking.objects.filter(client=client)
+            return BookingSerializer(bookings, many=True).data
+        except Exception as e:
+            raise ValidationError(f"Failed to retrieve bookings: {str(e)}")
+
+    def get_bookings_by_employee(self, user_id):
+        """
+        Retrieve all bookings for a specific employee.
+        """
+        try:
+            employee = User.objects.get(user_id=user_id)
+            bookings = Booking.objects.filter(employee=employee)
             return BookingSerializer(bookings, many=True).data
         except Exception as e:
             raise ValidationError(f"Failed to retrieve bookings: {str(e)}")
