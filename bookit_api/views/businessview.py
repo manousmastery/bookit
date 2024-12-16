@@ -11,7 +11,8 @@ from ..serializers.businessservicedetails import BusinessServiceDetailsSerialize
 from ..serializers.serviceserializer import ServiceSerializer
 from ..services.businessservice import BusinessService
 
-business_service =  BusinessService()
+business_service = BusinessService()
+
 
 @swagger_auto_schema(
     method='get',
@@ -21,6 +22,7 @@ business_service =  BusinessService()
 @api_view(['GET'])
 def get_all_business(request) -> Response:
     return Response(business_service.get_all())
+
 
 @swagger_auto_schema(
     method='get',
@@ -32,28 +34,20 @@ def get_business_info(request, business_id: int) -> Response:
     business_info = business_service.get_business_info(business_id)
     return Response(data=business_info)
 
+
 @swagger_auto_schema(
     method="post",
     operation_description="Service add endpoint",
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "service_id": openapi.Schema(
-                type=openapi.TYPE_INTEGER, description="service_id"
-            ),
-            "price": openapi.Schema(
-                type=openapi.TYPE_NUMBER, description="service price"
-            ),
-            "duration": openapi.Schema(
-                type=openapi.TYPE_INTEGER, description="service duration"
-            ),
-            "showed_name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="service name"
-            ),
+            "service_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="service_id"),
+            "price": openapi.Schema(type=openapi.TYPE_NUMBER, description="service price"),
+            "duration": openapi.Schema(type=openapi.TYPE_INTEGER, description="service duration"),
+            "showed_name": openapi.Schema(type=openapi.TYPE_STRING, description="service name"),
             "showed_description": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Service description"
             ),
-
         },
         required=["service_id", "price", "duration"],
     ),
@@ -89,22 +83,13 @@ def add_service_for_business(request, business_id):
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "service_id": openapi.Schema(
-                type=openapi.TYPE_INTEGER, description="service_id"
-            ),
-            "price": openapi.Schema(
-                type=openapi.TYPE_NUMBER, description="service price"
-            ),
-            "duration": openapi.Schema(
-                type=openapi.TYPE_INTEGER, description="service duration"
-            ),
-            "showed_name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="service name"
-            ),
+            "service_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="service_id"),
+            "price": openapi.Schema(type=openapi.TYPE_NUMBER, description="service price"),
+            "duration": openapi.Schema(type=openapi.TYPE_INTEGER, description="service duration"),
+            "showed_name": openapi.Schema(type=openapi.TYPE_STRING, description="service name"),
             "showed_description": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Service description"
             ),
-
         },
         required=["service_id", "price", "duration"],
     ),
@@ -140,9 +125,7 @@ def update_service_for_business(request, business_id):
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "service_id": openapi.Schema(
-                type=openapi.TYPE_INTEGER, description="service_id"
-            ),
+            "service_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="service_id"),
         },
         required=["service_id"],
     ),
@@ -160,7 +143,10 @@ def delete_service_for_business(request, business_id):
             service_id=request.data['service_id'],
         )
         service_details_params.validate_details_to_delete()
-        return Response(data=business_service.delete_service_for_business(service_details_params), status=status.HTTP_200_OK)
+        return Response(
+            data=business_service.delete_service_for_business(service_details_params),
+            status=status.HTTP_200_OK,
+        )
     except ValidationError as e:
         return Response(e, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
@@ -176,15 +162,14 @@ def delete_service_for_business(request, business_id):
 def get_services_for_business(request, business_id: int) -> Response:
     return Response(data=business_service.get_services_for_business(business_id))
 
+
 @swagger_auto_schema(
     method="post",
     operation_description="Business add employee endpoint",
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "user_id": openapi.Schema(
-                type=openapi.TYPE_INTEGER, description="user_id to add"
-            ),
+            "user_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="user_id to add"),
             "role": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Role of the employee, STAFF | ADMIN"
             ),
@@ -200,7 +185,10 @@ def get_services_for_business(request, business_id: int) -> Response:
 @api_view(["POST"])
 def add_employee(request, business_id) -> Response:
     user_id, role = request.data['user_id'], request.data['role']
-    return Response(data=business_service.add_employee(user_id=user_id, business_id=business_id, role=role))
+    return Response(
+        data=business_service.add_employee(user_id=user_id, business_id=business_id, role=role)
+    )
+
 
 @swagger_auto_schema(
     method="delete",
@@ -208,9 +196,7 @@ def add_employee(request, business_id) -> Response:
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "user_id": openapi.Schema(
-                type=openapi.TYPE_INTEGER, description="user_id to add"
-            ),
+            "user_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="user_id to add"),
         },
         required=["user_id"],
     ),
@@ -222,8 +208,9 @@ def add_employee(request, business_id) -> Response:
 )
 @api_view(["DELETE"])
 def remove_employee(request, business_id) -> Response:
-    user_id= request.data['user_id']
+    user_id = request.data['user_id']
     return Response(data=business_service.remove_employee(user_id, business_id))
+
 
 @swagger_auto_schema(
     method='get',

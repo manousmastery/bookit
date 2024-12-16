@@ -27,9 +27,7 @@ def get_categories(request) -> Response:
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Category name"
-            ),
+            "name": openapi.Schema(type=openapi.TYPE_STRING, description="Category name"),
             "description": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Category description"
             ),
@@ -51,9 +49,7 @@ def add_category(request) -> Response:
     except ValidationError as e:
         return Response(data={"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response(
-            data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @swagger_auto_schema(
@@ -62,9 +58,7 @@ def add_category(request) -> Response:
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Category name"
-            ),
+            "name": openapi.Schema(type=openapi.TYPE_STRING, description="Category name"),
         },
         required=["name"],
     ),
@@ -78,10 +72,10 @@ def add_category(request) -> Response:
 def remove_category(request) -> Response:
     category_name = request.data.get("name")
     try:
-        return Response(data=category_service.remove_category(category_name), status=status.HTTP_200_OK)
+        return Response(
+            data=category_service.remove_category(category_name), status=status.HTTP_200_OK
+        )
     except ValidationError as e:
         return Response(data={"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response(
-            data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -9,6 +9,7 @@ from ..services.userservice import UserService
 
 user_service = UserService()
 
+
 @swagger_auto_schema(
     method='post',
     operation_description="User login endpoint",
@@ -45,6 +46,7 @@ def login_view(request) -> Response:
 def logout_view(request) -> Response:
     user_service.logout_user(request)
     return Response({'success': 'Logged out successfully'})
+
 
 @swagger_auto_schema(
     method='post',
