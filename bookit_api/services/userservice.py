@@ -4,6 +4,7 @@ from rest_framework.exceptions import ValidationError
 
 from bookit_api.models import User
 from bookit_api.serializers.userserializer import UserSerializer
+
 # from bookit_api.services.bookingservice import BookingService
 from bookit_api.services.businessuserservice import BusinessUserService
 

@@ -2,6 +2,7 @@ from bookit_api.models import Business
 from bookit_api.serializers.userserializer import UserSerializer
 from rest_framework import serializers
 
+
 class BusinessSerializer(serializers.ModelSerializer):
     owner = UserSerializer(read_only=True)
 

@@ -29,9 +29,7 @@ def get_services(request) -> Response:
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Service name"
-            ),
+            "name": openapi.Schema(type=openapi.TYPE_STRING, description="Service name"),
             "description": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Service description"
             ),
@@ -59,9 +57,7 @@ def add_service(request) -> Response:
     except ValidationError as e:
         return Response(data={"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response(
-            data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @swagger_auto_schema(
@@ -70,9 +66,7 @@ def add_service(request) -> Response:
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Category name"
-            ),
+            "name": openapi.Schema(type=openapi.TYPE_STRING, description="Category name"),
         },
         required=["name"],
     ),
@@ -88,18 +82,21 @@ def remove_service(request) -> Response:
     if not service_name:
         raise ValidationError('"name" should be provided in the body')
     try:
-        return Response(data=service_service.remove_service(service_name), status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            data=service_service.remove_service(service_name), status=status.HTTP_204_NO_CONTENT
+        )
     except ValidationError as e:
         return Response(data={"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response(
-            data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @swagger_auto_schema(
     method="get",
     operation_description="Get business for service",
-    responses={200: openapi.Response("List of businesses", BusinessServiceDetailsSerializer(many=True))},
+    responses={
+        200: openapi.Response("List of businesses", BusinessServiceDetailsSerializer(many=True))
+    },
 )
 @api_view(["GET"])
 def get_business_for_service(request, service_id: int) -> Response:

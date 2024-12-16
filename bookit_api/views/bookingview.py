@@ -8,7 +8,8 @@ from rest_framework.response import Response
 from ..serializers.bookingserializer import BookingSerializer
 from ..services.bookingservice import BookingService
 
-booking_service =  BookingService()
+booking_service = BookingService()
+
 
 @swagger_auto_schema(
     method='post',
@@ -49,6 +50,7 @@ def cancel_booking(request, booking_id: int) -> Response:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     result = booking_service.cancel_booking(booking_id)
     return Response(result)
+
 
 @swagger_auto_schema(
     method='put',
@@ -105,6 +107,7 @@ def get_booking_by_client(request) -> Response:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     result = booking_service.get_bookings_by_client(user.user_id)
     return Response(result)
+
 
 @swagger_auto_schema(
     method='get',

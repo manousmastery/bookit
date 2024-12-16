@@ -11,4 +11,7 @@ class BusinessServiceDetails(models.Model):
     service = models.ForeignKey('Service', on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('business', 'service')  # Ensures unique combination of business and service
+        unique_together = (
+            'business',
+            'service',
+        )  # Ensures unique combination of business and service

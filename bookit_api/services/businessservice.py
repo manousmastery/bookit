@@ -32,22 +32,36 @@ class BusinessService:
         except Exception as e:
             raise ValidationError(f"Failed to retrieve business info: {str(e)}")
 
-    def add_service_for_business(self, business_detail_service_params: BusinessServiceDetailsParams):
+    def add_service_for_business(
+        self, business_detail_service_params: BusinessServiceDetailsParams
+    ):
         try:
-            business_detail_service_params.business = Business.objects.get(business_id=business_detail_service_params.business_id)
-            business_detail_service_params.service = self.service_service.get_service(business_detail_service_params.service_id)
+            business_detail_service_params.business = Business.objects.get(
+                business_id=business_detail_service_params.business_id
+            )
+            business_detail_service_params.service = self.service_service.get_service(
+                business_detail_service_params.service_id
+            )
 
-            business_service_details = self.business_service_detail_service.add_business_service_details(
-                business_detail_service_params
+            business_service_details = (
+                self.business_service_detail_service.add_business_service_details(
+                    business_detail_service_params
+                )
             )
             return business_service_details
         except Exception as e:
             raise ValidationError(f"Failed to create business service detail: {str(e)}")
 
-    def update_service_for_business(self, business_detail_service_params: BusinessServiceDetailsParams):
+    def update_service_for_business(
+        self, business_detail_service_params: BusinessServiceDetailsParams
+    ):
         try:
-            business_detail_service_params.business = Business.objects.get(business_id=business_detail_service_params.business_id)
-            business_detail_service_params.service = self.service_service.get_service(business_detail_service_params.service_id)
+            business_detail_service_params.business = Business.objects.get(
+                business_id=business_detail_service_params.business_id
+            )
+            business_detail_service_params.service = self.service_service.get_service(
+                business_detail_service_params.service_id
+            )
 
             business_service_details = self.business_service_detail_service.update_business_service(
                 business_detail_service_params
@@ -56,11 +70,19 @@ class BusinessService:
         except Exception as e:
             raise ValidationError(f"Failed to update business service details: {str(e)}")
 
-    def delete_service_for_business(self, business_detail_service_params: BusinessServiceDetailsParams):
+    def delete_service_for_business(
+        self, business_detail_service_params: BusinessServiceDetailsParams
+    ):
         try:
-            business_detail_service_params.business = Business.objects.get(business_id=business_detail_service_params.business_id)
-            business_detail_service_params.service = self.service_service.get_service(business_detail_service_params.service_id)
-            return self.business_service_detail_service.delete_business_service(business_detail_service_params)
+            business_detail_service_params.business = Business.objects.get(
+                business_id=business_detail_service_params.business_id
+            )
+            business_detail_service_params.service = self.service_service.get_service(
+                business_detail_service_params.service_id
+            )
+            return self.business_service_detail_service.delete_business_service(
+                business_detail_service_params
+            )
         except Exception as e:
             raise ValidationError(f"Failed to delete business service detail: {str(e)}")
 
@@ -88,5 +110,7 @@ class BusinessService:
 
     def get_business_by_category(self, category: str):
         business_details = self.service_service.get_business_details_from_service(category)
-        businesses = Business.objects.filter(business_id__in=business_details.values_list('business_id', flat=True)).distinct()
+        businesses = Business.objects.filter(
+            business_id__in=business_details.values_list('business_id', flat=True)
+        ).distinct()
         return BusinessSerializer(businesses, many=True).data

@@ -34,7 +34,9 @@ class ServiceService:
         except Exception as e:
             raise ValidationError(f"Failed to remove service: {str(e)}")
 
-    def update_service(self, service_id: int, name: str = None, description: str = None, category_name: str = None):
+    def update_service(
+        self, service_id: int, name: str = None, description: str = None, category_name: str = None
+    ):
         try:
             service = Service.objects.get(id=service_id)
 
@@ -53,7 +55,6 @@ class ServiceService:
             raise ValidationError(f"Service with ID {service_id} does not exist.")
         except Exception as e:
             raise ValidationError(f"Failed to update service: {str(e)}")
-
 
     def get_all_services(self) -> list:
         services = Service.objects.all()
@@ -79,5 +80,7 @@ class ServiceService:
 
     def get_business_details_from_service(self, category_name: str):
         services = self.get_services_from_category(category_name)
-        business_details = self.business_service_detail_service.get_business_details_from_service(services)
+        business_details = self.business_service_detail_service.get_business_details_from_service(
+            services
+        )
         return business_details

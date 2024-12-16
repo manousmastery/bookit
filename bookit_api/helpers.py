@@ -18,13 +18,19 @@ class BusinessServiceDetailsParams:
 
     def validate_details_to_add(self):
         if not self.service_id:
-            raise ValidationError(f'service_id must be provided if you want add a service for the business with id {self.business_id}')
+            raise ValidationError(
+                f'service_id must be provided if you want add a service for the business with id {self.business_id}'
+            )
 
         if not self.price or self.price <= 0:
-            raise ValidationError(f'Price must be provided if you want to add a service for the business with id {self.business_id}')
+            raise ValidationError(
+                f'Price must be provided if you want to add a service for the business with id {self.business_id}'
+            )
 
         if not self.duration and self.duration <= 0:
-            raise ValidationError(f'price must be provided if you want to add a service for the business with id {self.business_id}')
+            raise ValidationError(
+                f'price must be provided if you want to add a service for the business with id {self.business_id}'
+            )
 
     def validate_details_to_update(self):
         if (self.price and self.price <= 0) or (self.duration and self.duration <= 0):
@@ -36,7 +42,9 @@ class BusinessServiceDetailsParams:
     def validate_details_to_delete(self):
         if not self.service_id:
             raise ValidationError(
-                f'"service_id" must be provided if you want to remove a service for the business with id {self.business_id}')
+                f'"service_id" must be provided if you want to remove a service for the business with id {self.business_id}'
+            )
         if not self.business_id:
             raise ValidationError(
-                f'"business_id" must be provided if you want remove a service for the business with id {self.business_id}')
+                f'"business_id" must be provided if you want remove a service for the business with id {self.business_id}'
+            )
