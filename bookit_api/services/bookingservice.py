@@ -1,26 +1,27 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from bookit_api.models import Booking, User, Business
+
+from bookit_api.models import Booking, User, Business, BusinessServiceDetails
 from bookit_api.serializers.bookingserializer import BookingSerializer
 
 
 class BookingService:
-    def create_booking(self, client_id, employee_id, business_id, booking_date):
+    def create_booking(self, client_id, employee_id, businessservice_id, booking_date):
         """
         Create a new booking with the given details.
         """
         try:
             with transaction.atomic():
-                client = User.objects.get(id=client_id)
-                employee = User.objects.get(id=employee_id)
-                business = Business.objects.get(id=business_id)
+                client = User.objects.get(user_id=client_id)
+                employee = User.objects.get(user_id=employee_id)
+                business_service_details = BusinessServiceDetails.objects.get(businessservice_id=businessservice_id)
 
                 booking = Booking.objects.create(
                     client=client,
                     employee=employee,
-                    business=business,
                     booking_date=booking_date,
-                    status='PENDING'
+                    status='PENDING',
+                    business_service_details=business_service_details,
                 )
                 return BookingSerializer(booking).data
         except User.DoesNotExist:
@@ -79,7 +80,30 @@ class BookingService:
         Retrieve all bookings for a specific business.
         """
         try:
-            bookings = Booking.objects.filter(business_id=business_id)
+            bookings = Booking.objects.filter(business_service_details__business_id=business_id)
+            return BookingSerializer(bookings, many=True).data
+        except Exception as e:
+            raise ValidationError(f"Failed to retrieve bookings: {str(e)}")
+
+
+    def get_bookings_by_client(self, user_id):
+        """
+        Retrieve all bookings for a specific client.
+        """
+        try:
+            client = User.objects.get(user_id=user_id)
+            bookings = Booking.objects.filter(client=client)
+            return BookingSerializer(bookings, many=True).data
+        except Exception as e:
+            raise ValidationError(f"Failed to retrieve bookings: {str(e)}")
+
+    def get_bookings_by_employee(self, user_id):
+        """
+        Retrieve all bookings for a specific employee.
+        """
+        try:
+            employee = User.objects.get(user_id=user_id)
+            bookings = Booking.objects.filter(employee=employee)
             return BookingSerializer(bookings, many=True).data
         except Exception as e:
             raise ValidationError(f"Failed to retrieve bookings: {str(e)}")

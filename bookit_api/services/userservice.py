@@ -4,14 +4,14 @@ from rest_framework.exceptions import ValidationError
 
 from bookit_api.models import User
 from bookit_api.serializers.userserializer import UserSerializer
-from bookit_api.services.bookingservice import BookingService
+# from bookit_api.services.bookingservice import BookingService
 from bookit_api.services.businessuserservice import BusinessUserService
 
 
 class UserService:
     def __init__(self):
         self.busines_user_service = BusinessUserService()
-        self.booking_service = BookingService()
+        # self.booking_service = BookingService()
 
     def login_user(self, request, email, password):
         """
@@ -97,18 +97,18 @@ class UserService:
         user = User.objects.get(pk=user_id)
         return user
 
-    def view_bookings(self, user_id: int):
-        """
-        Retrieve all bookings for a specific business.
-        """
-        try:
-            bookings = self.booking_service.get_bookings_by_business(user_id)
-            return bookings
-        except Exception as e:
-            raise ValidationError(f"Failed to retrieve bookings: {str(e)}")
-
-    def update_availability(self, user_id, availability_data):
-        """
-        Placeholder for updating user availability (e.g., for employees).
-        """
-        pass
+    # def view_bookings(self, user_id: int):
+    #     """
+    #     Retrieve all bookings for a specific business.
+    #     """
+    #     try:
+    #         bookings = self.booking_service.get_bookings_by_business(user_id)
+    #         return bookings
+    #     except Exception as e:
+    #         raise ValidationError(f"Failed to retrieve bookings: {str(e)}")
+    #
+    # def update_availability(self, user_id, availability_data):
+    #     """
+    #     Placeholder for updating user availability (e.g., for employees).
+    #     """
+    #     pass
