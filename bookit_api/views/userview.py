@@ -1,14 +1,13 @@
-from django.contrib.auth import authenticate, login, logout
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from ..models import User
 from ..serializers.userserializer import UserSerializer
+from ..services.userservice import UserService
 
+user_service = UserService()
 
 @swagger_auto_schema(
     method='post',
@@ -30,11 +29,9 @@ from ..serializers.userserializer import UserSerializer
 def login_view(request) -> Response:
     email = request.data.get('email')
     password = request.data.get('password')
-    user = authenticate(request, email=email, password=password)
+    user = user_service.login_user(request, email, password)
     if user is not None:
-        login(request, user)
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
+        return Response(user)
     else:
         return Response({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -46,7 +43,7 @@ def login_view(request) -> Response:
 )
 @api_view(['POST'])
 def logout_view(request) -> Response:
-    logout(request)
+    user_service.logout_user(request)
     return Response({'success': 'Logged out successfully'})
 
 @swagger_auto_schema(
@@ -60,23 +57,12 @@ def logout_view(request) -> Response:
 )
 @api_view(['POST'])
 def signup_view(request) -> Response:
-    serializer = UserSerializer(data=request.data)
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    data = serializer.validated_data
+    data = request.data
     try:
-        user = User.objects.create_user(
-            email=data['email'],
-            password=request.data.get('password'),
-            first_name=data['first_name'],
-            last_name=data['last_name'],
-            phone_number=data['phone_number'],
-        )
-        login(request, user)  # Automatically log the user in
-        return Response({'message': 'User created successfully!'}, status=status.HTTP_201_CREATED)
-    except ValidationError as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = user_service.create_user(request, data)
+        return Response(result, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
@@ -86,9 +72,8 @@ def signup_view(request) -> Response:
 )
 @api_view(['GET'])
 def get_all(request) -> Response:
-    users = User.objects.all()
-    serializer = UserSerializer(users, many=True)
-    return Response(serializer.data)
+    users = user_service.get_all_users()
+    return Response(users)
 
 
 @swagger_auto_schema(
@@ -111,8 +96,16 @@ def get_all(request) -> Response:
 @api_view(['GET'])
 def get_by_id(request, user_id: int) -> Response:
     try:
-        user = User.objects.get(pk=user_id)
-    except User.DoesNotExist:
-        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-    serializer = UserSerializer(user)
-    return Response(serializer.data)
+        user_data = user_service.get_user_by_id(user_id)
+        return Response(user_data)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+def create_business_view(request) -> Response:
+    try:
+        business = user_service.create_business(request)
+        return Response(business)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
