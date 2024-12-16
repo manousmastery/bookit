@@ -17,6 +17,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
 
+
 class User(AbstractBaseUser):
     user_id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True)
