@@ -11,9 +11,9 @@ class BookingService:
         """
         try:
             with transaction.atomic():
-                client = User.objects.get(id=client_id)
-                employee = User.objects.get(id=employee_id)
-                business = Business.objects.get(id=business_id)
+                client = User.objects.get(user_id=client_id)
+                employee = User.objects.get(user_id=employee_id)
+                business = Business.objects.get(business_id=business_id)
 
                 booking = Booking.objects.create(
                     client=client,

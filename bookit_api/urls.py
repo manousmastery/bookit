@@ -1,5 +1,6 @@
 from django.urls import path
 
+from .views.bookingview import create_booking
 from .views.categoryview import add_category, remove_category, get_categories
 from .views.serviceview import get_services, add_service, remove_service, get_business_for_service
 from .views.userview import login_view, logout_view, signup_view, get_all, get_by_id, create_business_view
@@ -38,4 +39,8 @@ urlpatterns = [
     path('service/add_service/', add_service),
     path('service/remove_service/', remove_service),
     path('service/business/<int:service_id>/', get_business_for_service),
+
+    ######################################################################################################
+
+    path('booking/create/', create_booking),
 ]
