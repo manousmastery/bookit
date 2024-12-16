@@ -14,7 +14,9 @@ class BookingService:
             with transaction.atomic():
                 client = User.objects.get(user_id=client_id)
                 employee = User.objects.get(user_id=employee_id)
-                business_service_details = BusinessServiceDetails.objects.get(businessservice_id=businessservice_id)
+                business_service_details = BusinessServiceDetails.objects.get(
+                    businessservice_id=businessservice_id
+                )
 
                 booking = Booking.objects.create(
                     client=client,
@@ -84,7 +86,6 @@ class BookingService:
             return BookingSerializer(bookings, many=True).data
         except Exception as e:
             raise ValidationError(f"Failed to retrieve bookings: {str(e)}")
-
 
     def get_bookings_by_client(self, user_id):
         """
