@@ -1,11 +1,12 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from bookit_api.models import Booking, User, Business
+from bookit_api.models import Booking, User, Business, BusinessServiceDetails
 from bookit_api.serializers.bookingserializer import BookingSerializer
+from bookit_api.services.businessservice import BusinessService
 
 
 class BookingService:
-    def create_booking(self, client_id, employee_id, business_id, booking_date):
+    def create_booking(self, client_id, employee_id, businessservice_id, booking_date):
         """
         Create a new booking with the given details.
         """
@@ -13,14 +14,14 @@ class BookingService:
             with transaction.atomic():
                 client = User.objects.get(user_id=client_id)
                 employee = User.objects.get(user_id=employee_id)
-                business = Business.objects.get(business_id=business_id)
+                business_service_details = BusinessServiceDetails.objects.get(businessservice_id=businessservice_id)
 
                 booking = Booking.objects.create(
                     client=client,
                     employee=employee,
-                    business=business,
                     booking_date=booking_date,
-                    status='PENDING'
+                    status='PENDING',
+                    business_service_details=business_service_details,
                 )
                 return BookingSerializer(booking).data
         except User.DoesNotExist:

@@ -10,6 +10,7 @@ class Booking(models.Model):
     booking_id = models.AutoField(primary_key=True)
     client = models.ForeignKey('User', on_delete=models.CASCADE, related_name='client_bookings')
     employee = models.ForeignKey('User', on_delete=models.CASCADE, related_name='employee_bookings')
-    business = models.ForeignKey('Business', on_delete=models.CASCADE)
+    # business = models.ForeignKey('Business', on_delete=models.CASCADE)
+    business_service_details = models.ForeignKey('BusinessServiceDetails', on_delete=models.CASCADE)
     booking_date = models.DateTimeField(null=False)
     status = models.CharField(max_length=10, null=False, choices=BOOKING_STATUS)

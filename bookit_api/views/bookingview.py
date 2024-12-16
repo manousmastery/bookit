@@ -24,7 +24,7 @@ def create_booking(request) -> Response:
     try:
         booking_date = datetime.strptime(booking_data['booking_date'], '%Y-%m-%d')
         employee_id = int(booking_data['employee_id'])
-        business_id = int(booking_data['business_id'])
+        businessservice_id = int(booking_data['businessservice_id'])
     except ValueError as e:
         return Response(data=str(e), status=status.HTTP_400_BAD_REQUEST)
 
@@ -32,6 +32,6 @@ def create_booking(request) -> Response:
         employee_id=employee_id,
         booking_date=booking_date,
         client_id=user.user_id,
-        business_id=business_id
+        businessservice_id=businessservice_id,
     )
     return Response(result)
